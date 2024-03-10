@@ -21,21 +21,14 @@ from sklearn.pipeline import make_pipeline,  Pipeline
 from sklearn.model_selection import train_test_split,  cross_val_score, KFold, GridSearchCV
 from sklearn.metrics import roc_auc_score
 from tqdm import tqdm
+# this is from my package
+from my_preprocessing import cancer_preproc
 
 models_labels = ['Log Reg', 'Elastic net',
                  'LDA', 'KNN', 'DT', 'RF', 'Linear SVM', 'Non-linear SVM']
 
 # for categorical features
 lab_enc = preprocessing.LabelEncoder()
-
-###### Import and pre-process all requiered datasets
-###################################################3
-def cancer_preproc(file_path):
-    my_data_breast_cancer = (pd.DataFrame(pd.read_csv(file_path).drop_duplicates().dropna(axis = 'columns')).
-                             rename(columns={'diagnosis': 'target'}))
-    my_data_breast_cancer = my_data_breast_cancer.drop(['id'], axis=1).dropna()
-    my_data_breast_cancer['target'] = lab_enc.fit_transform(my_data_breast_cancer['target'].astype('category'))
-    return my_data_breast_cancer
 
 ############# IRIS ##################################
 

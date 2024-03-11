@@ -5,8 +5,7 @@ import numpy as np
 from time import time
 from sklearn import datasets
 import sklearn.linear_model as sk
-from sklearn.svm import SVC, LinearSVC
-
+from sklearn.svm import SVC
 #from matplotlib import pyplot as plt
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
@@ -39,8 +38,6 @@ iris = pd.DataFrame(
     columns=iris['feature_names'] + ['target']
 )
 
-# REGRESSION
-#liver_disease = pd.DataFrame(pd.read_csv("C://Users//user//Downloads//liver_disease.csv").dropna().drop_duplicates()).rename(columns={'drinks': 'target'})
 # CLASSIFICATION
 pre_term_data = pd.DataFrame(pd.read_csv("whole_cleaned_data_RAB_2019DEC23.csv").dropna().drop_duplicates()).rename(columns={'out': 'target'})
 pre_term_data_nuli = pre_term_data.loc[pre_term_data['parity_cat'] == 'Nuliparous']
@@ -82,8 +79,8 @@ my_models = [
         'label': 'Logistic Regression',
         'model': sk.LogisticRegression(max_iter=100000), # , solver = "newton-cg"
         'grid_params': None
- },
- {
+},
+{
         'label': 'Elastic net',
         'model': SGDClassifier(loss='log_loss', penalty='elasticnet', max_iter=100000),
         'grid_params':   {'alpha': [0.1, 1, 10, 0.01], 'l1_ratio': np.array([0.4, 0.5,  0.7, 0.9])}
@@ -93,10 +90,6 @@ my_models = [
         'model': LinearDiscriminantAnalysis(),
         'grid_params': None
 },
-    #{
-     #   'label': 'Quadratic Discriminant Analysis',
-     #   'model': QuadraticDiscriminantAnalysis(),
-    #},
 {
         'label': 'KNN',
         'model': KNN(),
@@ -129,21 +122,6 @@ my_models = [
 }
 ]
 
-def make_plots_compared(roc_matrix_breast_p, roc_matrix_breast_R, legend_loc, title):
-    roc_matrix_breast_p.columns = models_labels
-    roc_matrix_breast_R.columns = models_labels
-    cdf = pd.concat([roc_matrix_breast_p.assign(Software = 'Python'), roc_matrix_breast_R.assign(Software = 'R')])
-    mdf = pd.melt(cdf, id_vars=['Software'], var_name=['Model']).rename(columns = {'value': 'AUC score'})
-    sns.set_style("whitegrid")
-    sns.set_context("notebook")
-    b = sns.boxplot(x="Model", y="AUC score", hue="Software", fill=True, data=mdf)
-    b.set_xlabel("Model", fontsize=20)
-    b.set_ylabel("AUC", fontsize=20)
-    b.tick_params(labelsize=16)
-    plt.title(title,  fontsize = 30)
-    plt.legend(loc=legend_loc, fontsize="28")
-    plt.subplots_adjust(left=0.085, right=0.99, top=0.99, bottom=0.1)
-    plt.show()
 
 # pre term birth
 # roc_matrix_ptb_py = pd.DataFrame(get_all_roc(1, ptb_new_features, False, 'ptb', 'classification')).T
@@ -160,11 +138,11 @@ roc_matrix_prostate_py.to_csv('prostate_new_tuned_python.csv', encoding='utf-8')
 # iris
 roc_matrix_iris_R = pd.DataFrame(pd.read_csv("C://Users//user//Downloads//iris_new_tuned_R.csv"))
 roc_matrix_iris_py = pd.DataFrame(pd.read_csv("C://Users//user//Downloads//iris_new_tuned_python.csv")).drop(['Unnamed: 0'], axis = 1)
-make_plots_compared(roc_matrix_iris_py, roc_matrix_iris_R, "lower right", '')
+make_plots_compared(roc_matrix_iris_py, roc_matrix_iris_R, "lower right", '', models_labels)
 
 roc_matrix_prostate_R = pd.DataFrame(pd.read_csv("C://Users//user//Downloads//cancer_new_tuned_R.csv"))
 roc_matrix_prostate_py = pd.DataFrame(pd.read_csv("C://Users//user//Downloads//prostate_new_tuned_python.csv")).drop(['Unnamed: 0'], axis = 1)
-make_plots_compared(roc_matrix_prostate_py, roc_matrix_prostate_R, "lower right", '')
+make_plots_compared(roc_matrix_prostate_py, roc_matrix_prostate_R, "lower right", '', models_labels)
 
 # heart, first 10000
 roc_matrix_heart_R = pd.DataFrame(pd.read_csv("C://Users//user//Downloads//heart_new_tuned_R.csv"))
@@ -193,14 +171,6 @@ roc_matrix_heart_py = pd.DataFrame(get_all_roc(1000, my_data_heart.head(1000), F
 roc_matrix_heart_py.to_csv('C://Users//user//Downloads//heart_new_tuned_python.csv', encoding='utf-8')
 
 
-pd.DataFrame(get_all_roc(10, my_data_heart.head(1000), True, 'heart')).T
-
-#roc_matrix_breast_py = pd.DataFrame(pd.read_csv("C://Users//user//Downloads//breast_new_tuned_python.csv")).drop(['Unnamed: 0'], axis = 1)
-#roc_matrix_breast_py.boxplot()
-#plt.show()
-
-
-
 # breast cancer dataset
 cc = pd.DataFrame(get_all_roc(1000, my_data_breast, True, 'breast')).T
 cc.to_csv('C://Users//user//Downloads//breast_new_tuned_python.csv', encoding='utf-8')
@@ -223,5 +193,5 @@ roc_matrix_heart_R = pd.DataFrame(pd.read_csv("C://Users//user//Downloads//heart
 
 # plot this shit
 #figure, axis = plt.subplots(2, 2)
-#make_plots_compared(roc_matrix_heart_py, roc_matrix_heart_R, "lower right")
+#make_plots_compared(roc_matrix_heart_py, roc_matrix_heart_R, "lower right", )
 #make_plots_compared(roc_matrix_prostate_py, roc_matrix_prostate_R, "lower right")

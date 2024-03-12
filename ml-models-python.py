@@ -21,7 +21,7 @@ from sklearn.metrics import roc_auc_score
 from tqdm import tqdm
 # this is from my package
 from my_preprocessing import cancer_preproc
-from plotting import get_all_roc
+from plotting import get_all_roc, get_roc_and_ci, plot_for_every_model, make_plots_compared
 
 models_labels = ['Log Reg', 'Elastic net',
                  'LDA', 'KNN', 'DT', 'RF', 'Linear SVM', 'Non-linear SVM']
@@ -123,75 +123,27 @@ my_models = [
 ]
 
 
-# pre term birth
-# roc_matrix_ptb_py = pd.DataFrame(get_all_roc(1, ptb_new_features, False, 'ptb', 'classification')).T
-# roc_matrix_ptb_py.to_csv('C://Users//user//Downloads//ptb_new_tuned_python.csv', encoding='utf-8')
-
 # iris disease dataset
-
+roc_matrix_iris_py = pd.DataFrame(get_all_roc(1000, iris, False, 'heart', 'classification', cv_score, my_models)).T
+roc_matrix_iris_py.to_csv('iris_new_tuned_python.csv', encoding='utf-8')
 # prostate cancer
 roc_matrix_prostate_py = pd.DataFrame(get_all_roc(10, my_data_prostate, False, 'prostate', 'classification', cv_score, my_models)).T
 roc_matrix_prostate_py.to_csv('prostate_new_tuned_python.csv', encoding='utf-8')
+# heart disease 
+roc_matrix_heart_py = pd.DataFrame(get_all_roc(1000, my_data_heart.head(1000), False, 'heart')).T
+roc_matrix_heart_py.to_csv('heart_new_tuned_python.csv', encoding='utf-8')
+# prostate cancer
+roc_matrix_breast_py = pd.DataFrame(get_all_roc(10, my_data_breast, False, 'breast', 'classification', cv_score, my_models)).T
+roc_matrix_breast_py.to_csv('breast_new_tuned_python.csv', encoding='utf-8')
 
 
-# WITH THE FINAL DATASETS
-# iris
-roc_matrix_iris_R = pd.DataFrame(pd.read_csv("C://Users//user//Downloads//iris_new_tuned_R.csv"))
-roc_matrix_iris_py = pd.DataFrame(pd.read_csv("C://Users//user//Downloads//iris_new_tuned_python.csv")).drop(['Unnamed: 0'], axis = 1)
+# Make two boxplots of the AUC scores (one obtained in R and one in Python)
+roc_matrix_iris_R = pd.DataFrame(pd.read_csv("iris_new_tuned_R.csv"))
+roc_matrix_iris_py = pd.DataFrame(pd.read_csv("iris_new_tuned_python.csv")).drop(['Unnamed: 0'], axis = 1)
 make_plots_compared(roc_matrix_iris_py, roc_matrix_iris_R, "lower right", '', models_labels)
 
-roc_matrix_prostate_R = pd.DataFrame(pd.read_csv("C://Users//user//Downloads//cancer_new_tuned_R.csv"))
-roc_matrix_prostate_py = pd.DataFrame(pd.read_csv("C://Users//user//Downloads//prostate_new_tuned_python.csv")).drop(['Unnamed: 0'], axis = 1)
-make_plots_compared(roc_matrix_prostate_py, roc_matrix_prostate_R, "lower right", '', models_labels)
 
-# heart, first 10000
-roc_matrix_heart_R = pd.DataFrame(pd.read_csv("C://Users//user//Downloads//heart_new_tuned_R.csv"))
-roc_matrix_heart_py = pd.DataFrame(pd.read_csv("C://Users//user//Downloads//heart_new_tuned_python.csv")).drop(['Unnamed: 0'], axis = 1)
-make_plots_compared(roc_matrix_heart_py, roc_matrix_heart_R, "lower right", '')
-
-# Read the AUC data from an already existing file
-roc_matrix_breast_R = pd.DataFrame(pd.read_csv("C://Users//user//Downloads//breast_new_tuned_R.csv"))
-roc_matrix_breast_py = pd.DataFrame(pd.read_csv("C://Users//user//Downloads//breast_new_tuned_python.csv")).drop(['Unnamed: 0'], axis = 1)
-make_plots_compared(roc_matrix_breast_py, roc_matrix_breast_R, "lower right", '')
-
-roc_matrix_iris_py = pd.DataFrame(get_all_roc(1000, iris, False, 'iris', 'classification')).T
-roc_matrix_iris_py.to_csv('C://Users//user//Downloads//iris_new_tuned_python.csv', encoding='utf-8')
-
-roc_matrix_heart_py = pd.DataFrame(get_all_roc(1000, my_data_heart.head(1000), False, 'heart', 'classification')).T
-roc_matrix_heart_py.to_csv('C://Users//user//Downloads//heart_new_tuned_python.csv', encoding='utf-8')
-
-# breast
-roc_matrix_breast_py = pd.DataFrame(get_all_roc(1000, my_data_breast, True, 'breast', 'classification')).T
-roc_matrix_breast_py.to_csv('C://Users//user//Downloads//breast_new_tuned_python.csv', encoding='utf-8')
-
-all_aucs_df = pd.DataFrame()
+# MODULE FROM MY PACKAGE
+plot_for_every_model(100, my_data_prostate, 'cancer data')
 
 
-roc_matrix_heart_py = pd.DataFrame(get_all_roc(1000, my_data_heart.head(1000), False, 'heart')).T
-roc_matrix_heart_py.to_csv('C://Users//user//Downloads//heart_new_tuned_python.csv', encoding='utf-8')
-
-
-# breast cancer dataset
-cc = pd.DataFrame(get_all_roc(1000, my_data_breast, True, 'breast')).T
-cc.to_csv('C://Users//user//Downloads//breast_new_tuned_python.csv', encoding='utf-8')
-aa = 1
-
-
-#get_all_roc(10, iris, False, 'iris')
-#get_all_roc(10, my_data_prostate, False, 'prostate')
-# heart disease
-#roc_matrix_heart_py = pd.DataFrame(get_all_roc(1000, my_data_heart.head(1000), False, 'heart')).T
-#roc_matrix_heart_py.to_csv('C://Users//user//Downloads//heart_new_tuned_python.csv', encoding='utf-8')
-
-#roc_matrix_prostate_py_old = pd.DataFrame(pd.read_csv("C://Users//user//Downloads//prostate_new_tuned_python.csv")).drop(['Unnamed: 0'], axis = 1)
-#roc_matrix_prostate_py_old.boxplot()
-
-#make_plots_compared(roc_matrix_prostate_py, roc_matrix_prostate_R, "lower right", 'prostate cancer dataset')
-
-roc_matrix_heart_R = pd.DataFrame(pd.read_csv("C://Users//user//Downloads//heart_new_tuned_R.csv"))
-#roc_matrix_heart_R.boxplot()
-
-# plot this shit
-#figure, axis = plt.subplots(2, 2)
-#make_plots_compared(roc_matrix_heart_py, roc_matrix_heart_R, "lower right", )
-#make_plots_compared(roc_matrix_prostate_py, roc_matrix_prostate_R, "lower right")

@@ -1,6 +1,4 @@
-import seaborn as sns
-import pandas as pd
-from matplotlib import pyplot as plt
+#import seaborn as sns
 
 def make_plots_compared(roc_matrix_breast_p, roc_matrix_breast_R, legend_loc, title, models_labels):
     roc_matrix_breast_p.columns = models_labels

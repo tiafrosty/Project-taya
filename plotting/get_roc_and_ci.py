@@ -1,8 +1,18 @@
+import numpy as np
+import pandas as pd
+from time import time
+from matplotlib import pyplot as plt
+from sklearn import preprocessing
+import seaborn as sns
+from sklearn.pipeline import make_pipeline
+# for CV
+from sklearn.model_selection import train_test_split, KFold, GridSearchCV
+from sklearn.metrics import roc_auc_score
+
 
 
 # plot the ROC curves and CI
 def get_roc_and_ci(N, k, ax, iris):
-    ######3333333 ploooooooooot
     tprs = []
     all_auc = []
     base_fpr = np.linspace(0, 1, 101)
@@ -15,16 +25,10 @@ def get_roc_and_ci(N, k, ax, iris):
         s_seed = randint(1, N)
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=s_seed)
         model = my_model.fit(X_train, y_train)
-        #cur_auc = np.mean(roc_scores_df[i])
-        if my_models[k]['label'] == 'Non-linear SVM' or my_models[k]['label'] == 'Linear SVM':
-            clf = model.fit(X_train, y_train)
-            calibrator = CalibratedClassifierCV(clf)
-            model = calibrator.fit(X_train, y_train)
+
         auc = metrics.roc_auc_score(y_test, model.predict_proba(X_test)[:, 1])
         fpr, tpr, thresholds = metrics.roc_curve(y_test, model.predict_proba(X_test)[:, 1])
-        #plt.plot(fpr, tpr, 'b', alpha=0.15)
         plt.sca(ax)
-        #plt.sca(ax)
         tpr = np.interp(base_fpr, fpr, tpr)
         tpr[0] = 0.0
         tprs.append(tpr)
@@ -46,28 +50,21 @@ def get_roc_and_ci(N, k, ax, iris):
     plt.ylabel('True Positive Rate')
     plt.xlabel('False Positive Rate')
     plt.legend(loc = 'lower right', fontsize = 15)
-    #plt.title('ROC score  and CI for tested models', fontsize = 25)
-    #plt.show()
     
     
-    
-def plot_for_every_model(my_models, data_for_plotting, p_title):
+def plot_for_every_model(N, iris, dataset_name, my_models):
 
     fig, axes = plt.subplots(nrows = 3, ncols= 3)
-        # for confusion matrix
+    # for confusion matrix
     k = 0
-    # PLot the classification report as a heat map for all tested models
     for i in range(len(axes)):
         for j in range(len(axes[0])):
-            if data_for_plotting == 'report':
-                sns.heatmap(pd.DataFrame(all_reports_sum[k]).iloc[:-1, :].T, annot=True, ax=axes[i][j], cbar=False)
-            elif data_for_plotting == 'conf matrix':
-                all_conf_matrix[k].plot(ax= axes[i][j])
+            get_roc_and_ci(N, k, axes[i][j], iris)
             axes[i][j].title.set_text(my_models[k]['label'])
             # next
             k = k + 1
-
     fig.subplots_adjust(wspace=0.3, hspace= 0.5)
-    fig.suptitle(p_title, fontsize = 25)
+    fig.suptitle('ROC score for tested models for %s' % dataset_name, fontsize = 25)
     plt.show()
+
 

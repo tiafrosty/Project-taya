@@ -2,7 +2,6 @@ import pandas as pd
 
 import numpy as np
 
-from time import time
 from sklearn import datasets
 import sklearn.linear_model as sk
 from sklearn.svm import SVC
@@ -14,11 +13,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import SGDClassifier
 from sklearn import preprocessing
 #import seaborn as sns
-from sklearn.pipeline import make_pipeline,  Pipeline
-# for CV
-from sklearn.model_selection import train_test_split,  cross_val_score, KFold, GridSearchCV
-from sklearn.metrics import roc_auc_score
-from tqdm import tqdm
+
 # this is from my package
 from my_preprocessing import cancer_preproc
 from plotting import get_all_roc, get_roc_and_ci, plot_for_every_model, make_plots_compared
@@ -124,11 +119,14 @@ my_models = [
 
 
 # iris disease dataset
-roc_matrix_iris_py = pd.DataFrame(get_all_roc(1000, iris, False, 'heart', 'classification', cv_score, my_models)).T
-roc_matrix_iris_py.to_csv('iris_new_tuned_python.csv', encoding='utf-8')
+roc_matrix_iris_py = pd.DataFrame(get_all_roc(10, iris, False, 'heart', 'classification', cv_score, my_models)).T
+#roc_matrix_iris_py.to_csv('iris_new_tuned_python.csv', encoding='utf-8')
 # prostate cancer
 roc_matrix_prostate_py = pd.DataFrame(get_all_roc(10, my_data_prostate, False, 'prostate', 'classification', cv_score, my_models)).T
-roc_matrix_prostate_py.to_csv('prostate_new_tuned_python.csv', encoding='utf-8')
+#roc_matrix_prostate_py.to_csv('prostate_new_tuned_python.csv', encoding='utf-8')
+
+make_plots_compared(roc_matrix_iris_py, roc_matrix_prostate_py, "lower right", '', models_labels)
+
 # heart disease 
 roc_matrix_heart_py = pd.DataFrame(get_all_roc(1000, my_data_heart.head(1000), False, 'heart')).T
 roc_matrix_heart_py.to_csv('heart_new_tuned_python.csv', encoding='utf-8')
@@ -140,7 +138,6 @@ roc_matrix_breast_py.to_csv('breast_new_tuned_python.csv', encoding='utf-8')
 # Make two boxplots of the AUC scores (one obtained in R and one in Python)
 roc_matrix_iris_R = pd.DataFrame(pd.read_csv("iris_new_tuned_R.csv"))
 roc_matrix_iris_py = pd.DataFrame(pd.read_csv("iris_new_tuned_python.csv")).drop(['Unnamed: 0'], axis = 1)
-make_plots_compared(roc_matrix_iris_py, roc_matrix_iris_R, "lower right", '', models_labels)
 
 
 # MODULE FROM MY PACKAGE

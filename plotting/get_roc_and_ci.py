@@ -8,11 +8,11 @@ from sklearn.pipeline import make_pipeline
 # for CV
 from sklearn.model_selection import train_test_split, KFold, GridSearchCV
 from sklearn.metrics import roc_auc_score
-
-
+from random import randint
+from sklearn import metrics
 
 # plot the ROC curves and CI
-def get_roc_and_ci(N, k, ax, iris):
+def get_roc_and_ci(N, k, ax, iris, my_models):
     tprs = []
     all_auc = []
     base_fpr = np.linspace(0, 1, 101)
@@ -22,6 +22,7 @@ def get_roc_and_ci(N, k, ax, iris):
     X = iris.drop(['target'], axis=1)
 
     for i in range(N):
+        print(i)
         s_seed = randint(1, N)
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=s_seed)
         model = my_model.fit(X_train, y_train)
@@ -59,12 +60,17 @@ def plot_for_every_model(N, iris, dataset_name, my_models):
     k = 0
     for i in range(len(axes)):
         for j in range(len(axes[0])):
-            get_roc_and_ci(N, k, axes[i][j], iris)
+            if k == len(my_models):
+                break
+            
+            get_roc_and_ci(N, k, axes[i][j], iris, my_models)
             axes[i][j].title.set_text(my_models[k]['label'])
-            # next
+            # next               
             k = k + 1
     fig.subplots_adjust(wspace=0.3, hspace= 0.5)
     fig.suptitle('ROC score for tested models for %s' % dataset_name, fontsize = 25)
     plt.show()
+    
+    print('all plots should be printed')
 
 

@@ -11,7 +11,7 @@ from sklearn.metrics import roc_auc_score
 from tqdm import tqdm
 
 
-def get_all_roc(N, iris, scale, dataset_name, task, cv_score, my_models):
+def get_auc_for_every_model(N, iris, scale, dataset_name, task, cv_score, my_models):
     
 
     # Prepare the data

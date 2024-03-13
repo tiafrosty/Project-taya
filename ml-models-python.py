@@ -14,7 +14,9 @@ from sklearn import preprocessing
 
 # Import modules from my package
 from my_preprocessing import cancer_preproc
-from plotting import get_all_roc, get_roc_and_ci, plot_for_every_model, make_plots_compared
+from plotting import get_roc_and_ci, plot_for_every_model, make_plots_compared
+from get_auc import get_auc_for_every_model
+
 
 models_labels = ['Log Reg', 'Elastic net',
                  'LDA', 'KNN', 'DT', 'RF', 'Linear SVM', 'Non-linear SVM']
@@ -70,7 +72,7 @@ my_models = [
 
 {
         'label': 'Logistic Regression',
-        'model': sk.LogisticRegression(max_iter=100000), # , solver = "newton-cg"
+        'model': sk.LogisticRegression(max_iter=100000),
         'grid_params': None
 },
 {
@@ -101,7 +103,7 @@ my_models = [
 },
 
 {
-        # C is the penalty
+        # C is the penalty, gamma measures how far away can influencing points be
         'label': 'Linear SVM',
         'model': SVC(kernel= 'linear', C = 1, probability=True),
         'grid_params': None  # ?
@@ -118,27 +120,27 @@ my_models = [
 
 plot_for_every_model(10, my_data_prostate, 'prostate cancer', my_models)
 # iris disease dataset
-roc_matrix_iris_py = pd.DataFrame(get_all_roc(1000, iris, False, 'heart', 'classification', cv_score, my_models)).T
+roc_matrix_iris_py = pd.DataFrame(get_auc_for_every_model(1000, iris, False, 'heart', 'classification', cv_score, my_models)).T
 # get the results from R
 roc_matrix_iris_R = pd.DataFrame(pd.read_csv("iris_new_tuned_R.csv"))
 make_plots_compared(roc_matrix_iris_py, roc_matrix_iris_R, "lower right", '', models_labels)
 
 #roc_matrix_iris_py.to_csv('iris_new_tuned_python.csv', encoding='utf-8')
 # prostate cancer
-roc_matrix_prostate_py = pd.DataFrame(get_all_roc(10, my_data_prostate, False, 'prostate', 'classification', cv_score, my_models)).T
+roc_matrix_prostate_py = pd.DataFrame(get_auc_for_every_model(10, my_data_prostate, False, 'prostate', 'classification', cv_score, my_models)).T
 roc_matrix_prostate_R = pd.DataFrame(pd.read_csv("prostate_new_tuned_R.csv"))
 make_plots_compared(roc_matrix_prostate_py, roc_matrix_prostate_R, "lower right", '', models_labels)
 #roc_matrix_prostate_py.to_csv('prostate_new_tuned_python.csv', encoding='utf-8')
 
 
 # heart disease 
-roc_matrix_heart_py = pd.DataFrame(get_all_roc(1000, my_data_heart.head(1000), False, 'heart')).T
+roc_matrix_heart_py = pd.DataFrame(get_auc_for_every_model(1000, my_data_heart.head(1000), False, 'heart','classification', cv_score, my_models)).T
 roc_matrix_heart_R = pd.DataFrame(pd.read_csv("heart_new_tuned_R.csv"))
 make_plots_compared(roc_matrix_heart_py, roc_matrix_heart_R, "lower right", '', models_labels)
 #roc_matrix_heart_py.to_csv('heart_new_tuned_python.csv', encoding='utf-8')
 
 # breast cancer
-roc_matrix_breast_py = pd.DataFrame(get_all_roc(10, my_data_breast, False, 'breast', 'classification', cv_score, my_models)).T
+roc_matrix_breast_py = pd.DataFrame(get_auc_for_every_model(10, my_data_breast, False, 'breast', 'classification', cv_score, my_models)).T
 roc_matrix_breast_R = pd.DataFrame(pd.read_csv("breast_new_tuned_R.csv"))
 make_plots_compared(roc_matrix_breast_py, roc_matrix_breast_R, "lower right", '', models_labels)
 #roc_matrix_breast_py.to_csv('breast_new_tuned_python.csv', encoding='utf-8')

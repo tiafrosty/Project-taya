@@ -10,9 +10,38 @@ from sklearn.model_selection import train_test_split, KFold, GridSearchCV
 from sklearn.metrics import roc_auc_score
 from tqdm import tqdm
 
-
+"""
+A method for computing the table of the AUC scores given amount of times for given list of models for given dataset. 
+""" 
 def get_auc_for_every_model(N, iris, scale, dataset_name, task, cv_score, my_models):
     
+    """
+    Takes the dataset and performs the binary classification of the target column using each of the models in a given list 
+    for a given number of iterations. Returns the computed AUC scores as a data frame.
+
+    Parameters
+    ----------
+    N : integer
+        The number of iterations 
+    iris: data frame
+        The dataset for which to perform binary classification
+    scale: boolean
+        Indicates wether or not features need to be scaled
+    dataset_name: string
+        Name of the dataset
+    task: string
+        Indicates which type of problem needs to be solved (classification or regression). Currently not used but is planned to use later.    
+    cv_score: integer
+        The value of k in k-fold cross-validation performed for grid search
+    my_models: dictionary
+        The list of models used for implementing the binary classification
+    
+    Returns
+    -------
+    The table  of size Nxk of obtained AUC scores, where N is the number of iterations and k is the number of models 
+
+    """
+ 
 
     # Prepare the data
     if task == 'classification':

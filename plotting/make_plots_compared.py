@@ -3,7 +3,36 @@ import pandas as pd
 from matplotlib import pyplot as plt
 
 
+"""
+A method for comparasion the tables obtained in R and Python. 
+""" 
 def make_plots_compared(roc_matrix_breast_p, roc_matrix_breast_R, legend_loc, title, models_labels):
+    """
+    Takes two data frames and plots a boxplot of them on one figure
+
+    Parameters
+    ----------
+    roc_matrix_breast_p : data frame
+        The matrix obtained using Python
+
+    roc_matrix_breast_python : data frame
+        The matrix obtained using Python
+
+    legend_loc: string
+        Position of the legend. Takes values 'topleft', 'topright', 'bottomleft', 'bottomright' and 'best'.
+
+    title: string
+        Title of the plot
+
+    models_labels: list
+        labels for each box plot
+
+
+    Returns
+    -------
+    The boxplot of the given data frames
+    """
+
     roc_matrix_breast_p.columns = models_labels
     roc_matrix_breast_R.columns = models_labels
     cdf = pd.concat([roc_matrix_breast_p.assign(Software = 'Python'), roc_matrix_breast_R.assign(Software = 'R')])

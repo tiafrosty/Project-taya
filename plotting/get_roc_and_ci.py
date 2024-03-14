@@ -12,7 +12,39 @@ from random import randint
 from sklearn import metrics
 
 # plot the ROC curves and CI
+
+"""
+A method for calculating and plotting the ROC for each of the model in the given list. 
+""" 
 def get_roc_and_ci(N, k, ax, iris, my_models):
+    
+    """
+    Takes the dataset and performs the binary classification N times on the target column, 
+    then returns the AUC scores and the plot of the ROC.
+
+    Parameters
+    ----------
+    N : integer
+        The number of iterations under which classification is performed
+
+    k: inetger
+        Index of the current plot
+
+    ax: integer
+        index of the current axis
+
+    iris: data frame
+        dataset on which classification is performed
+
+    my_models: dictionary
+        list of the models for implementing the classification
+
+    Returns
+    -------
+    The figure grid with ROC plots for every model in the given list
+    
+    """
+    
     tprs = []
     all_auc = []
     base_fpr = np.linspace(0, 1, 101)

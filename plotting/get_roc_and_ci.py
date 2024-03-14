@@ -20,7 +20,7 @@ def get_roc_and_ci(N, k, ax, iris, my_models):
     
     """
     Takes the dataset and performs the binary classification N times on the target column, 
-    then returns the AUC scores and the plot of the ROC.
+    then returns the AUC scores together with confidence intervals and the plot of the ROC.
 
     Parameters
     ----------
@@ -41,7 +41,7 @@ def get_roc_and_ci(N, k, ax, iris, my_models):
 
     Returns
     -------
-    The figure grid with ROC plots for every model in the given list
+   
     
     """
     
@@ -84,9 +84,32 @@ def get_roc_and_ci(N, k, ax, iris, my_models):
     plt.xlabel('False Positive Rate')
     plt.legend(loc = 'lower right', fontsize = 15)
     
-    
+"""
+A method for plotting the ROC for each of the model in the given list. 
+"""    
 def plot_for_every_model(N, iris, dataset_name, my_models):
+    """
+    Calls the get_roc_and_ci_funtcion in nested loops 
 
+    Parameters
+    ----------
+    N : integer
+        The number of iterations under which classification is performed
+
+    iris: data frame
+        dataset on which classification is performed
+
+    dataset_name: string
+        name of the dataset
+
+    my_models: dictionary
+        list of the models for implementing the classification
+    
+    Returns
+    -------
+    The figure grid with ROC plots for every model in a given list
+    
+    """
     fig, axes = plt.subplots(nrows = 3, ncols= 3)
     # for confusion matrix
     k = 0

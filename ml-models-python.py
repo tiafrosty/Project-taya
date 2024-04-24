@@ -9,7 +9,6 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.neighbors import KNeighborsClassifier as KNN
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import SGDClassifier
 from sklearn import preprocessing
 
 # Import modules from my package
@@ -72,13 +71,13 @@ my_models = [
 
 {
         'label': 'Logistic Regression',
-        'model': sk.LogisticRegression(max_iter=100000),
+        'model': sk.LogisticRegression(max_iter=10000),
         'grid_params': None
-},
-{
+ },
+ {
         'label': 'Elastic net',
-        'model': SGDClassifier(loss='log_loss', penalty='elasticnet', max_iter=100000),
-        'grid_params':   {'alpha': [0.1, 1, 10, 0.01], 'l1_ratio': np.array([0.4, 0.5,  0.7, 0.9])}
+        'model': sk.LogisticRegression(max_iter = 10000, penalty= 'elasticnet', solver = 'saga', l1_ratio = 0.5), # , solver = "newton-cg" #SGDClassifier(loss='log_loss', penalty='elasticnet', max_iter=100000),
+        'grid_params': None #{ 'l1_ratio': np.array([0.4, 0.5,  0.7, 0.9])}
 },
 {
         'label': 'Linear Discriminant Analysis',
@@ -117,10 +116,35 @@ my_models = [
 }
 ]
 
+# the plots to show ROC curves and CI intervals
+ci_data_R_iris = pd.DataFrame(pd.read_csv("ci_data_R_iris.csv"))
+ci_data_R_prostate = pd.DataFrame(pd.read_csv("ci_data_R_prostate.csv"))
+ci_data_R_heart = pd.DataFrame(pd.read_csv("ci_data_R_heart.csv"))
+ci_data_R_breast = pd.DataFrame(pd.read_csv("ci_data_R_breast.csv"))
 
-plot_for_every_model(10, my_data_prostate, 'prostate cancer', my_models)
 # iris disease dataset
-roc_matrix_iris_py = pd.DataFrame(get_auc_for_every_model(1000, iris, False, 'heart', 'classification', cv_score, my_models)).T
+#roc_matrix_iris_py = pd.DataFrame(get_auc_for_every_model(100, iris, False, 'iris', 'classification', cv_score, my_models, ci_data_R_iris)).T
+
+#roc_matrix_prostate_py = pd.DataFrame(get_auc_for_every_model(100, my_data_prostate, False, 'prostate', 'classification', cv_score, my_models, ci_data_R_prostate)).T
+
+roc_matrix_iris_py = pd.DataFrame(get_auc_for_every_model(100, my_data_heart.head(1000), False, 
+                                                          'heart', 'classification', cv_score, my_models, ci_data_R_heart)).T
+
+roc_matrix_iris_py = pd.DataFrame(get_auc_for_every_model(100, my_data_breast, True, 
+                                                          'breast', 'classification', cv_score, my_models, ci_data_R_breast)).T
+
+plot_for_every_model(100, iris, my_models, ci_data_R_iris)
+
+#plot_for_every_model(1000, my_data_heart.head(1000), 'heart disease', my_models, ci_data_R)
+#plot_for_every_model(10, my_data_prostate, 'prostate cancer', my_models, ci_data_R)
+plot_for_every_model(100, my_data_breast, my_models, ci_data_R_breast)
+
+
+
+plot_for_every_model(100, my_data_prostate, 'prostate cancer', my_models, ci_data_R_prostate)
+plot_for_every_model(100, my_data_heart.head(1000), 'heart disease', my_models, ci_data_R_heart)
+
+
 # get the results from R
 roc_matrix_iris_R = pd.DataFrame(pd.read_csv("iris_new_tuned_R.csv"))
 make_plots_compared(roc_matrix_iris_py, roc_matrix_iris_R, "lower right", '', models_labels)

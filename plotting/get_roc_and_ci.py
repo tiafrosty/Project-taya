@@ -18,7 +18,7 @@ A method for calculating and plotting the ROC for each of the model in the given
 """ 
 def get_roc_and_ci(N, k, ax, iris, my_models, data_from_R):
     
-    """
+    """f
     Takes the dataset and performs the binary classification N times on the target column, 
     then returns the AUC scores together with confidence intervals and the plot of the ROC.
 
@@ -164,8 +164,142 @@ def plot_roc_and_ci_one_model(k, ax, data_from_py, data_from_R):
     plt.legend(loc = 'lower right', fontsize = 18)
 
 
+
+# only one software 
+def plot_roc_and_ci_Python(k, ax, data_from_py):
+    
+    """
+    Takes the dataset and performs the binary classification N times on the target column, 
+    then returns the AUC scores together with confidence intervals and the plot of the ROC.
+
+    Parameters
+    ----------
+    N : integer
+        The number of iterations under which classification is performed
+
+    k: integer
+        Index of the current plot
+
+    ax: integer
+        index of the current axis
+
+    iris: data frame
+        dataset on which classification is performed
+
+    my_models: dictionary
+        list of the models for implementing the classification
+
+    Returns
+    -------
+    
+    """
+
+    # Custom settings for the plot
+    # confidence intervals
+    
+    base_fpr = np.linspace(0, 1, 101)
+    
+    plt.sca(ax)
+    
+    py_cur_mean = data_from_py['mean_tpr'+ str(k)]
+    py_cur_low = data_from_py['lower_tpr'+ str(k)]
+    py_cur_upp = data_from_py['upper_tpr'+ str(k)]    
+    
+    lab_low = round(np.mean(py_cur_low), 2)
+    lab_upp = round(np.mean(py_cur_upp), 2)
+    # R 
+    # ploooooooooot
+    # pyhton
+    plt.plot(base_fpr, py_cur_mean, 'b', label='ROC (area = %0.2f)' % (np.mean(py_cur_mean)))
+    plt.fill_between(base_fpr, py_cur_low, py_cur_upp, color='#069AF3', alpha=0.3,
+                     label='95% CI: {'+str(lab_low)+', '+str(lab_upp)+'}'
+                     )
+    # custom settings
+    plt.plot([0, 1], [0, 1], 'r--')
+    plt.xlim([-0.01, 1.01])
+    plt.ylim([-0.01, 1.01])
+    plt.ylabel('True Positive Rate', fontsize = 18)
+    plt.xlabel('False Positive Rate', fontsize = 18)
+    plt.legend(loc = 'lower right', fontsize = 18)
+
 """
-A method for plotting the ROC for each of the model in the given list. 
+A method for plotting the ROC for each of the model on ONE PLOT
+"""
+def plot_roc_all_models_one_plot(iris, my_models, title_lab):
+    ######3333333 ploooooooooot
+    y = iris['target'].astype('int')
+    X = iris.drop(['target'], axis=1)
+
+    for model in my_models:
+        
+        my_model = model['model']
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+        my_model = my_model.fit(X_train, y_train)
+        # try to export the predicted values and plot them together with those obtained in R
+        y_pred = my_model.predict_proba(X_test)[:, 1]
+
+        fpr, tpr, thresholds = metrics.roc_curve(y_test, my_model.predict_proba(X_test)[:,1])
+        
+        #print(fpr)
+        #print(tpr)
+        # Calculate Area under the curve to display on the plot
+        auc = metrics.roc_auc_score(y_test, my_model.predict_proba(X_test)[:, 1])
+        # Now, plot the computed values
+        plt.plot(fpr, tpr, linewidth = 5, label='%s ROC (area = %0.2f)' % (model['label'], auc))
+
+    # Custom settings for the plot
+    # confidence intervals
+    plt.plot([0, 1], [0, 1], 'r--', linewidth = 5)
+    plt.ylabel('True Positive Rate', fontsize = 30)
+    plt.xlabel('False Positive Rate', fontsize = 30)
+    plt.legend(loc = 'lower right', fontsize = 25)
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+    plt.title('ROC score for tested models '+title_lab, fontsize = 30)
+    plt.show()
+
+
+"""
+A method for plotting the ROC for the already obtained data
+"""
+def plot_roc_all_models_one_plot_data(iris, my_models, title_lab, data_all_models):
+
+    for i in range(len(my_models)):
+    #for model in my_models:
+        model = my_models[i]
+
+        y_test = data_all_models['y_test'+str(i)]
+        
+        y_pred = data_all_models['y_true'+str(i)]
+        
+        fpr, tpr, thresholds = metrics.roc_curve(y_test, y_pred)
+        
+        #print(fpr)
+        #print(tpr)
+        # Calculate Area under the curve to display on the plot
+        auc = metrics.roc_auc_score(y_test, y_pred)
+        # Now, plot the computed values
+        plt.plot(fpr, tpr, linewidth = 5, label='%s ROC (area = %0.2f)' % (model, auc))
+
+
+    print(fpr)
+    print(tpr)
+    # Custom settings for the plot
+    # confidence intervals
+    plt.plot([0, 1], [0, 1], 'r--', linewidth = 5)
+    plt.ylabel('True Positive Rate', fontsize = 30)
+    plt.xlabel('False Positive Rate', fontsize = 30)
+    plt.legend(loc = 'lower right', fontsize = 25)
+    plt.xticks(fontsize=20)
+    plt.yticks(fontsize=20)
+    plt.title('ROC score for tested models '+title_lab, fontsize = 30)
+    plt.show()
+
+
+
+
+"""
+A method for plotting the ROC for each of the model in the given list on separate plots together with CI. 
 """    
 def plot_for_every_model(data_from_py, data_from_R, my_models):
 #def plot_for_every_model(N, iris, my_models, data_from_R):
@@ -191,16 +325,18 @@ def plot_for_every_model(data_from_py, data_from_R, my_models):
     The figure grid with ROC plots for every model in a given list
     
     """
-    fig, axes = plt.subplots(nrows = 3, ncols= 3)
+    fig, axes = plt.subplots(nrows = 2, ncols= 3)
     k = 0
     for i in range(len(axes)):
         for j in range(len(axes[0])):
             if k == len(my_models):
                 break
-            plot_roc_and_ci_one_model(k, axes[i][j], data_from_py, data_from_R)
+            
+            plot_roc_and_ci_Python(k, axes[i][j], data_from_py)
+            #plot_roc_and_ci_one_model(k, axes[i][j], data_from_py, data_from_R)
             #get_roc_and_ci(N, k, axes[i][j], iris, my_models, data_from_R)
             #axes[i][j].title.set_text(my_models[k]['label'], fontsize = 10)
-            axes[i][j].set_title(my_models[k]['label'], fontsize = 18)
+            axes[i][j].set_title(my_models[k], fontsize = 18)
             # next               
             k = k + 1
     fig.subplots_adjust(wspace=0.3, hspace= 0.5)
